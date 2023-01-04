@@ -1,0 +1,6 @@
+venv/
+# hide sensitive information 
+/.env
+
+# cache
+/__pycache__
