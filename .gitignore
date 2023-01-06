@@ -3,4 +3,4 @@ venv/
 /.env
 
 # cache
-__Poll/pycache__/
+Poll/__pycache__/
