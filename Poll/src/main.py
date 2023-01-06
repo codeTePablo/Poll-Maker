@@ -4,7 +4,6 @@ from psycopg2.errors import DivisionByZero
 from dotenv import load_dotenv
 import database
 
-
 DATABASE_PROMPT = "Enter the DATABASE_URI value or leave empty to load from .env file: "
 MENU_PROMPT = """-- Menu --
 
@@ -88,7 +87,7 @@ def menu():
     database_uri = input(DATABASE_PROMPT)
     if not database_uri:
         load_dotenv()
-        database_uri = os.environ["DATABASE_URI"] 
+        database_uri = os.environ["DATABASE_URI"] # search url on environment variable
 
     connection = psycopg2.connect(database_uri)
     database.create_tables(connection)
