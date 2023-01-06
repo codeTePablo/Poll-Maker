@@ -11,12 +11,12 @@ CREATE_VOTES = """CREATE TABLE IF NOT EXISTS votes
 FOREIGN KEY(option_id) REFERENCES options(id));"""
 
 # DML
-SELECT_ALL_POLLS = """SELECT * FORM polls;"""
+SELECT_ALL_POLLS = """SELECT * FROM polls;"""
 SELECT_POLL_WITH_OPTIONS = """ SELECT * FROM polls
-JOIN options ON polls_id = options.poll_id
+JOIN options ON polls.id = options.poll_id
 WHERE polls.id = %s;"""
 SELECT_LATEST_POLL = """SELECT * FROM polls
-JOIN options ON polls_id = options.poll_id
+JOIN options ON polls.id = options.poll_id
 WHERE polls_id (
     SELECT id FROM polls ORDER BY id DESC LIMIT 1
 );""" # nested query
@@ -62,7 +62,7 @@ def get_poll_details(connection, poll_id):
     """
     with connection:
         with connection.cursor() as cursor:
-            cursor.execute(SELECT_POLL_WITH_OPTIONS, (poll_id))
+            cursor.execute(SELECT_POLL_WITH_OPTIONS, (poll_id,))
             return cursor.fetchall()
 
 def get_poll_and_vote_results(connection, poll_id):
