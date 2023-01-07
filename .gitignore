@@ -1,6 +1,10 @@
+# virtual enviroment
 venv/
 # hide sensitive information 
 /.env
 
 # cache
 __pycache__/
+
+# notes 
+/notes.txt

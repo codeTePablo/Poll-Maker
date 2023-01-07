@@ -49,7 +49,7 @@ def prompt_vote_poll(connection):
 
 def _print_poll_options(poll_with_options):
     for option in poll_with_options:
-        print(f"{option[0]}: {option[4]}")
+        print(f"{option[3]}: {option[4]}")
 
 
 def show_poll_votes(connection):
