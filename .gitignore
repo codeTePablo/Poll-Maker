@@ -8,3 +8,6 @@ __pycache__/
 
 # notes 
 /notes.txt
+
+# hide gui (temporary)
+build/

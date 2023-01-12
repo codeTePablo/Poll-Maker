@@ -19,17 +19,27 @@ NEW_OPTION_PROMPT = "Enter new option text (or leave empty to stop adding option
 
 
 def prompt_create_poll(connection):
+    """
+    Args:
+        param1 (connection): connection database.
+
+    Return: create new poll.
+    """
     poll_title = input("Enter poll title: ")
     poll_owner = input("Enter poll owner: ")
     options = []
 
-    while (new_option := input(NEW_OPTION_PROMPT)):
+    while new_option := input(NEW_OPTION_PROMPT):
         options.append(new_option)
 
     database.create_poll(connection, poll_title, poll_owner, options)
 
 
 def list_open_polls(connection):
+    """
+    :param p1: connection database
+    :return: show all polls
+    """
     polls = database.get_polls(connection)
 
     for _id, title, owner in polls:
@@ -37,6 +47,10 @@ def list_open_polls(connection):
 
 
 def prompt_vote_poll(connection):
+    """
+    :param p1: connection database
+    :return: all vote into a poll
+    """
     poll_id = int(input("Enter poll would you like to vote on: "))
 
     poll_options = database.get_poll_details(connection, poll_id)
@@ -47,12 +61,20 @@ def prompt_vote_poll(connection):
     database.add_poll_vote(connection, username, option_id)
 
 
-def _print_poll_options(poll_with_options):
+def _print_poll_options(poll_with_options: list[database.PollWithOptions]):
+    """
+    :param p1: print list of poll with options
+    :return: print in console poll and options
+    """
     for option in poll_with_options:
         print(f"{option[3]}: {option[4]}")
 
 
 def show_poll_votes(connection):
+    """
+    :param p1: connection database
+    :return: show result of poll
+    """
     poll_id = int(input("Enter poll you would like to see votes for: "))
     try:
         # This gives us count and percentage of votes for each option in a poll
@@ -65,13 +87,29 @@ def show_poll_votes(connection):
 
 
 def randomize_poll_winner(connection):
+    """
+    :param p1: connection database
+    :return:
+    """
     poll_id = int(input("Enter poll you'd like to pick a winner for: "))
     poll_options = database.get_poll_details(connection, poll_id)
     _print_poll_options(poll_options)
 
-    option_id = int(input("Enter which is the winning option, we'll pick a random winner from voters: "))
+    option_id = int(
+        input(
+            "Enter which is the winning option, we'll pick a random winner from voters: "
+        )
+    )
     winner = database.get_random_poll_vote(connection, option_id)
     print(f"The randomly selected winner is {winner[0]}.")
+
+
+def new_user(connection):
+    """
+    :param p1: connection database
+    :return:
+    """
+    pass
 
 
 MENU_OPTIONS = {
@@ -79,7 +117,8 @@ MENU_OPTIONS = {
     "2": list_open_polls,
     "3": prompt_vote_poll,
     "4": show_poll_votes,
-    "5": randomize_poll_winner
+    "5": randomize_poll_winner,
+    "6": new_user,
 }
 
 
@@ -87,7 +126,7 @@ def menu():
     database_uri = input(DATABASE_PROMPT)
     if not database_uri:
         load_dotenv()
-        database_uri = os.environ["DATABASE_URI"] # search url on environment variable
+        database_uri = os.environ["DATABASE_URI"]  # search url on environment variable
 
     connection = psycopg2.connect(database_uri)
     database.create_tables(connection)
@@ -99,4 +138,4 @@ def menu():
             print("Invalid input selected. Please try again.")
 
 
-menu()
+# menu()
