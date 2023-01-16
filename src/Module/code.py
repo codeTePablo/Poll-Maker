@@ -2,7 +2,7 @@ import os
 import psycopg2
 from psycopg2.errors import DivisionByZero
 from dotenv import load_dotenv
-import database
+from src.Module import database
 
 DATABASE_PROMPT = "Enter the DATABASE_URI value or leave empty to load from .env file: "
 MENU_PROMPT = """-- Menu --
@@ -21,7 +21,7 @@ NEW_OPTION_PROMPT = "Enter new option text (or leave empty to stop adding option
 def prompt_create_poll(connection):
     """
     Args:
-        param1 (connection): connection database.
+        arg1 (connection): connection database.
 
     Return: create new poll.
     """
@@ -37,8 +37,10 @@ def prompt_create_poll(connection):
 
 def list_open_polls(connection):
     """
-    :param p1: connection database
-    :return: show all polls
+    Args:
+        arg1 (connection): connection database.
+    Return:
+        Query: show all polls
     """
     polls = database.get_polls(connection)
 
@@ -48,8 +50,10 @@ def list_open_polls(connection):
 
 def prompt_vote_poll(connection):
     """
-    :param p1: connection database
-    :return: all vote into a poll
+    Args:
+        arg1 (connection): connection database.
+    Return:
+        Query: all vote into a poll
     """
     poll_id = int(input("Enter poll would you like to vote on: "))
 
@@ -63,8 +67,10 @@ def prompt_vote_poll(connection):
 
 def _print_poll_options(poll_with_options: list[database.PollWithOptions]):
     """
-    :param p1: print list of poll with options
-    :return: print in console poll and options
+    Args:
+        arg1 (list): print list of poll with options
+    Return:
+        list: print in console poll and options
     """
     for option in poll_with_options:
         print(f"{option[3]}: {option[4]}")
@@ -72,8 +78,10 @@ def _print_poll_options(poll_with_options: list[database.PollWithOptions]):
 
 def show_poll_votes(connection):
     """
-    :param p1: connection database
-    :return: show result of poll
+    Args:
+        arg1 (connection): connection database.
+    Return:
+        Query: show result of poll
     """
     poll_id = int(input("Enter poll you would like to see votes for: "))
     try:
@@ -88,8 +96,10 @@ def show_poll_votes(connection):
 
 def randomize_poll_winner(connection):
     """
-    :param p1: connection database
-    :return:
+    Args:
+        arg1 (connection): connection database.
+    Return:
+        Query: print poll options (list) and winner of that poll
     """
     poll_id = int(input("Enter poll you'd like to pick a winner for: "))
     poll_options = database.get_poll_details(connection, poll_id)
@@ -106,8 +116,10 @@ def randomize_poll_winner(connection):
 
 def new_user(connection):
     """
-    :param p1: connection database
-    :return:
+    Args:
+        arg1 (connection): connection database.
+    Return:
+        Query: print poll options (list) and winner of that poll
     """
     pass
 
@@ -123,6 +135,12 @@ MENU_OPTIONS = {
 
 
 def menu():
+    """
+    Args:
+        arg1 (): N.
+    Return:
+        Query: print poll options (list) and winner of that poll
+    """
     database_uri = input(DATABASE_PROMPT)
     if not database_uri:
         load_dotenv()
@@ -136,6 +154,3 @@ def menu():
             MENU_OPTIONS[selection](connection)
         except KeyError:
             print("Invalid input selected. Please try again.")
-
-
-# menu()

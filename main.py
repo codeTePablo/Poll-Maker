@@ -1,5 +1,5 @@
-import src.Module as main
+from src.Module.code import menu
 
 
 if __name__ == "__main__":
-    main.menu()
+    menu()
