@@ -1,11 +1,14 @@
-# database
+#  Database
 psycopg2-binary==2.9.5
 
-# enviroment variables
+#  Enviroment variables
 python-dotenv==0.21.0
 
-# GUI desinger
+#  GUI desinger
 tkdesigner==1.0.6
 
-# util (optional)
+#  Util (optional)
 alive-progress==3.0.1
+
+#  Time
+pytz==

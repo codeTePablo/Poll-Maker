@@ -1,9 +1,14 @@
+import pytz
+import datetime
+
+from typing import List
+
 from src.Module import database
-from src.Models.connections import create_connection
+from src.Models.connection_pool import get_connection
 
 
 class Option:
-    def __init__(self, _id: None, option_text: str, poll_id: int):
+    def __init__(self, option_text: str, poll_id: int, _id: int = None):
         self.id = _id
         self.text = option_text
         self.poll_id = poll_id
@@ -26,12 +31,11 @@ class Option:
         Return:
             Query: add options
         """
-        connection = create_connection()
-        new_save = database.add_option(connection, self.text, self.poll_id)
-        connection.close()
-        self.id = new_save
+        with get_connection() as connection:
+            new_save = database.add_option(connection, self.text, self.poll_id)
+            self.id = new_save
 
-    def vote(self, user_name: str):
+    def vote(self, username: str):
         """
         Args:
             arg1 (str): user name to can add votes
@@ -39,26 +43,26 @@ class Option:
         Return:
             Query: add vote some poll with user name
         """
-        connection = create_connection()
-        new_option_id = database.add_poll_vote(connection, user_name, self.id)
-        connection.close()
+        current_datetime_utc = datetime.datetime.now(tz=pytz.utc)
+        current_timestamp = current_datetime_utc.timestamp()
+        with get_connection() as connection:
+            database.add_poll_vote(connection, username, current_timestamp, self.id)
 
     @property
-    def votes(self) -> list[database.Vote]:
+    def votes(self) -> List[database.Vote]:
         """
         Args:
             arg1 (self): self class
 
         Return:
-            list: list of Vote (str, int)
+            List: List of Vote (str, int)
         """
-        connection = create_connection()
-        votes = database.get_votes_for_option(connection, self.id)
-        connection.close()
-        return votes
+        with get_connection() as connection:
+            votes = database.get_votes_for_option(connection, self.id)
+            return votes
 
     @classmethod
-    def get(cls, option_id: int):
+    def get(cls, option_id: int) -> "Option":
         """
         Args:
             arg1 (self): self class
@@ -66,7 +70,6 @@ class Option:
         Return:
             str: return option_text, id, poll_id
         """
-        connection = create_connection()
-        option = database.get_option(connection, option_id)
-        connection.close()
-        return cls(option[1], option[2], option[0])
+        with get_connection() as connection:
+            option = database.get_option(connection, option_id)
+            return cls(option[1], option[2], option[0])

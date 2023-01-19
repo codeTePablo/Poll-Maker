@@ -1,4 +1,4 @@
-from src.Module.code import menu
+from src.Module.main import menu
 
 
 if __name__ == "__main__":

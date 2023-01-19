@@ -1,6 +1,10 @@
+#  Models
+from typing import List
 from src.Module import database
 from src.Models.option import Option
-from src.Models.connections import create_connection
+
+#  SimpleConnection
+from src.Models.connection_pool import get_connection
 
 
 class Poll:
@@ -26,20 +30,6 @@ class Poll:
         """
         return f"Poll {self.name!r}, {self.owner!r}, {self.id!r}"  #
 
-    def save(self):
-        """
-        Save new poll
-        Args:
-            arg1 (self): self class
-        Return:
-            Query: create new poll inside in database and this self.id will be
-            this new poll
-        """
-        connection = create_connection()
-        new_poll_id = database.create_poll(connection, self.title, self.owner)
-        connection.close()
-        self.id = new_poll_id
-
     def add_option(self, option_text: str):
         """
         Adding options to a poll
@@ -50,18 +40,30 @@ class Poll:
         """
         Option(option_text, self.id).save()
 
+    def save(self):
+        """
+        Save new poll
+        Args:
+            arg1 (self): self class
+        Return:
+            Query: create new poll inside in database and this self.id will be
+            this new poll
+        """
+        with get_connection() as connection:
+            new_poll_id = database.create_poll(connection, self.title, self.owner)
+            self.id = new_poll_id
+
     @property  # Allow to easily find the options
-    def options(self) -> list[Option]:
+    def options(self) -> List[Option]:
         """
         Args:
             arg1 (self): self class
         Return:
-            list: list of options of a some poll
+            List: List of options of a some poll
         """
-        connection = create_connection()
-        options = database.get_poll_details(connection, self.id)
-        connection.close()
-        return [Option(option[1], option[2], option[0]) for option in options]
+        with get_connection() as connection:
+            options = database.get_poll_options(connection, self.id)
+            return [Option(option[1], option[2], option[0]) for option in options]
 
     @classmethod
     def get(cls, poll_id: int) -> "Poll":
@@ -73,23 +75,22 @@ class Poll:
             This can be execute after the class has finished processing
             Poll object: get polls
         """
-        connection = create_connection()
-        poll = database.get_polls(connection, poll_id)
-        connection.close()
-        return cls(poll[1], poll[2], poll[0])
+        with get_connection() as connection:
+            poll = database.get_poll(connection, poll_id)
+            return cls(poll[1], poll[2], poll[0])
 
     @classmethod
-    def all(cls) -> list["Poll"]:
+    def all(cls) -> List["Poll"]:
         """
         Args:
             arg1 (cls): classmethod
         Return:
-            list: list comprehension of poll to return title, owner and id of
+            List: List comprehension of poll to return title, owner and id of
             one poll
         """
-        connection = create_connection()
-        polls = database.get_polls(connection)
-        return [cls(poll[1], poll[2], poll[0]) for poll in polls]
+        with get_connection() as connection:
+            polls = database.get_polls(connection)
+            return [cls(poll[1], poll[2], poll[0]) for poll in polls]
 
     @classmethod
     def latest(cls) -> "Poll":
@@ -99,7 +100,6 @@ class Poll:
         Return:
             Poll: get latest poll with title, owner and id of poll
         """
-        connection = create_connection()
-        poll = database.get_latest_poll(connection)
-        connection.close()
-        return cls(poll[1], poll[2], poll[0])
+        with get_connection() as connection:
+            poll = database.get_latest_poll(connection)
+            return cls(poll[1], poll[2], poll[0])
