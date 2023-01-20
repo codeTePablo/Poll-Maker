@@ -1,10 +1,10 @@
-#  Models
 from typing import List
-from src.Module import database
-from src.Models.option import Option
 
-#  SimpleConnection
-from src.Models.connection_pool import get_connection
+import psycopg2
+
+from connection_pool import get_connection
+from models.option import Option
+import database
 
 
 class Poll:
@@ -28,7 +28,7 @@ class Poll:
         Return:
             str: return Poll: option_text, id, poll_id
         """
-        return f"Poll {self.name!r}, {self.owner!r}, {self.id!r}"  #
+        return f"Poll({self.name!r}, {self.owner!r}, {self.id!r})"
 
     def add_option(self, option_text: str):
         """
@@ -53,7 +53,7 @@ class Poll:
             new_poll_id = database.create_poll(connection, self.title, self.owner)
             self.id = new_poll_id
 
-    @property  # Allow to easily find the options
+    @property
     def options(self) -> List[Option]:
         """
         Args:

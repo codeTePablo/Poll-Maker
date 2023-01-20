@@ -1,5 +1,4 @@
-from src.Module.main import menu
-
+from app import menu
 
 if __name__ == "__main__":
     menu()

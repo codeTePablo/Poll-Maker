@@ -11,4 +11,4 @@ tkdesigner==1.0.6
 alive-progress==3.0.1
 
 #  Time
-pytz==
+pytz==2022.7.1

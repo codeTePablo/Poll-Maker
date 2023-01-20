@@ -1,10 +1,9 @@
-import pytz
-import datetime
-
 from typing import List
+import datetime
+import pytz
 
-from src.Module import database
-from src.Models.connection_pool import get_connection
+from connection_pool import get_connection
+import database
 
 
 class Option:
@@ -21,7 +20,7 @@ class Option:
         Return:
             str: return option_text, id, poll_id
         """
-        return f"Option: {self.text!r}, {self.id!r}, {self.poll_id!r}"
+        return f"Option({self.text!r}, {self.poll_id!r}, {self.id!r})"
 
     def save(self):
         """
@@ -32,8 +31,8 @@ class Option:
             Query: add options
         """
         with get_connection() as connection:
-            new_save = database.add_option(connection, self.text, self.poll_id)
-            self.id = new_save
+            new_option_id = database.add_option(connection, self.text, self.poll_id)
+            self.id = new_option_id
 
     def vote(self, username: str):
         """

@@ -11,3 +11,5 @@ __pycache__/
 
 # hide gui (temporary)
 build/
+
+/.vscode
