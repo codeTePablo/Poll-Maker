@@ -1,6 +1,10 @@
 from typing import List, Tuple
 from contextlib import contextmanager
 
+import psycopg2
+import os
+from dotenv import load_dotenv
+
 
 Poll = Tuple[int, str, str]
 Option = Tuple[int, str, int]
@@ -18,7 +22,6 @@ SELECT_LATEST_POLL = """SELECT * FROM polls
 WHERE polls.id = (
     SELECT id FROM polls ORDER BY id DESC LIMIT 1
 );"""
-
 SELECT_POLL_OPTIONS = "SELECT * FROM options WHERE poll_id = %s;"
 SELECT_OPTION = "SELECT * FROM options WHERE id = %s;"
 
@@ -33,6 +36,23 @@ INSERT_OPTION = (
 INSERT_VOTE = (
     "INSERT INTO votes (username, option_id, vote_timestamp) VALUES (%s, %s, %s);"
 )
+
+#  Plots 
+load_dotenv()
+connection_plot = psycopg2.connect(os.environ.get("DATABASE_URI"))
+
+SELECT_ONE_POLL = "SELECT * FROM polls WHERE id = %s;"
+SELECT_OPTIONS_IN_POLL = """
+SELECT options.option_text, COUNT(votes.option_id) FROM options
+JOIN polls ON options.poll_id = polls.id
+JOIN votes ON options.id = votes.option_id
+WHERE polls.id = %s
+GROUP BY options.option_text;"""
+SELECT_EACH_POLLS = """
+SELECT polls.title, COUNT(votes.option_id) FROM polls
+JOIN options ON options.poll_id = polls.id
+JOIN votes ON options.id = votes.option_id
+GROUP BY polls.title;"""
 
 
 @contextmanager
@@ -111,6 +131,27 @@ def get_poll_options(connection, poll_id: int) -> List[Option]:
         return cursor.fetchall()
 
 
+def get_poll_bar(poll_id: int):
+    with connection_plot:
+        with connection_plot.cursor() as cursor:
+            cursor.execute(SELECT_ONE_POLL, (poll_id,))
+            return cursor.fetchone()
+
+
+def get_polls_and_votes():
+    """
+    plt
+    Args:
+        arg1 (int): poll id to can add option
+    Return:
+        Query: add option to poll
+    """
+    with connection_plot:
+        with connection_plot.cursor() as cursor:
+            cursor.execute(SELECT_EACH_POLLS)
+            return cursor.fetchall()
+
+
 # -- options --
 
 
@@ -118,6 +159,19 @@ def get_option(connection, option_id: int) -> Option:
     with get_cursor(connection) as cursor:
         cursor.execute(SELECT_OPTION, (option_id,))
         return cursor.fetchone()
+
+def get_options(poll_id: int):
+    """
+    plt
+    Args:
+        arg1 (int): poll id to can add option
+    Return:
+        Query: add option to poll
+    """
+    with connection_plot:
+        with connection_plot.cursor() as cursor:
+            cursor.execute(SELECT_OPTIONS_IN_POLL, (poll_id,))
+            return cursor.fetchall()
 
 
 def add_option(connection, option_text: str, poll_id: int):
