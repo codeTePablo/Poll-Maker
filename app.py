@@ -1,8 +1,13 @@
 from typing import List
+
 import random
 import datetime
 import pytz
+import matplotlib.pyplot as plt
+
+import charts
 import database
+
 from connection_pool import get_connection
 from models.option import Option
 from models.poll import Poll
@@ -15,10 +20,20 @@ MENU_PROMPT = """-- Menu --
 3) Vote on a poll
 4) Show poll votes
 5) Select a random winner from a poll option
-6) Exit
+6) Charts
+7) Bar chart all polls 
+8) Exit
 
 Enter your choice: """
 
+MENU_PROMPT_CHART = """-- Menu --
+1) Pie chart
+2) Bar chart
+3) 
+4) 
+5)
+6) Exit
+""" 
 NEW_OPTION_PROMPT = "Enter new option text (or leave empty to stop adding options): "
 
 
@@ -92,13 +107,60 @@ def randomize_poll_winner():
     winner = random.choice(votes)
     print(f"The randomly selected winner is {winner[0]}.")
 
+#  CHARTS
+
+
+def all_bar_chart():
+    charts.chart_bar(database.get_polls_and_votes())
+    plt.show()
+
+
+def select_chart(poll_id):
+    while (selection := input(MENU_PROMPT_CHART)) != "6":
+
+        try:
+            MENU_OPTIONS_CHARTS[selection](poll_id)
+
+        except KeyError:
+            print("Invalid input selected. Please try again.")
+
+
+def pie_chart(poll_id: int):
+    charts.one_chart_bar(database.get_polls_and_votes())
+    plt.show()
+
+def bar_chart(poll_id: int):
+    with get_connection() as connection:
+        poll = database.get_poll_bar(poll_id)
+        charts.one_chart_bar(poll)
+        plt.show()
+
+
+
+MENU_OPTIONS_CHARTS = {
+    "1": pie_chart,
+    "2": bar_chart
+}
+
+def select_poll():  
+    try:
+        for poll in Poll.all():
+            print(f"{poll.id}: {poll.title} (created by {poll.owner})")
+        # print("All bar chart of polls (2)")
+        poll_id = int(input("Enter poll would you like see stats: "))
+        select_chart(poll_id)
+
+    except KeyError:
+        print("Invalid input selected. Please try again.")
 
 MENU_OPTIONS = {
     "1": prompt_create_poll,
     "2": list_open_polls,
     "3": prompt_vote_poll,
     "4": show_poll_votes,
-    "5": randomize_poll_winner
+    "5": randomize_poll_winner,
+    "6": select_poll, 
+    "7": all_bar_chart
 }
 
 
@@ -106,11 +168,8 @@ def menu():
     with get_connection() as connection:
         database.create_tables(connection)
 
-    while (selection := input(MENU_PROMPT)) != "6":
+    while (selection := input(MENU_PROMPT)) != "8":
         try:
             MENU_OPTIONS[selection]()
         except KeyError:
             print("Invalid input selected. Please try again.")
-
-
-menu()
