@@ -12,3 +12,6 @@ alive-progress==3.0.1
 
 #  Time
 pytz==2022.7.1
+
+#  Math
+matplotlib==3.6.3
