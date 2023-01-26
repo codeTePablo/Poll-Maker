@@ -5,7 +5,8 @@ Program developed in Python Using ElephantSQL to store all votes of different us
 The workspace folders are:
 - `doc`: Documentation. User Documentation, UML & EntityRelation model .
 - `models`: Models classes.
-	- `model`:
+- `test`: testing charts (matplotlib).
+	- `build` : GUI
   
   ### Documentation
   
