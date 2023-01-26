@@ -38,6 +38,10 @@ NEW_OPTION_PROMPT = "Enter new option text (or leave empty to stop adding option
 
 
 def prompt_create_poll():
+    """
+    Return:
+        Query: create and add options to poll
+    """
     title = input("Enter poll title: ")
     owner = input("Enter poll owner: ")
     poll = Poll(title, owner)
@@ -48,11 +52,19 @@ def prompt_create_poll():
 
 
 def list_open_polls():
+    """
+    Return:
+        Query: show all poll available
+    """
     for poll in Poll.all():
         print(f"{poll.id}: {poll.title} (created by {poll.owner})")
 
 
 def prompt_vote_poll():
+    """
+    Return:
+        Query: add vote with username to poll
+    """
     poll_id = int(input("Enter poll would you like to vote on: "))
 
     _print_poll_options(Poll.get(poll_id).options)
@@ -63,15 +75,27 @@ def prompt_vote_poll():
 
 
 def _print_poll_options(options: List[Option]):
+    """
+    plt
+    Args:
+        arg1 (List): List of Option model 
+    Return:
+        Query: print each option id and option text
+    """
     for option in options:
         print(f"{option.id}: {option.text}")
 
 
 def show_poll_votes():
+    """
+    Return:
+        Query: 
+    """
     poll_id = int(input("Enter poll you would like to see votes for: "))
-    poll = Poll.get(poll_id)
-    options = poll.options
-    votes_per_option = [len(option.votes) for option in options]
+    poll = Poll.get(poll_id)  #  Get poll from specific poll 
+    options = poll.options  #  Get options
+    votes_per_option = [len(option.votes) for option in options]  # Get total votes and show how many votes have each option (list)   
+    # print(votes_per_option)
     total_votes = sum(votes_per_option)
 
     try:
@@ -88,16 +112,26 @@ def show_poll_votes():
 
 
 def _print_votes_for_options(options: List[Option]):
+    """
+    Args:
+        arg1 (List): List of Option model 
+    Return:
+        str: Using pytz display in what zonetime someone add vote and this had to insert how is    
+    """
     for option in options:
         print(f"-- {option.text} --")
-        for vote in option.votes:
+        for vote in option.votes:  #  Get votes
             naive_datetime = datetime.datetime.utcfromtimestamp(vote[2])
             utc_date = pytz.utc.localize(naive_datetime)
-            local_date = utc_date.astimezone(pytz.timezone("Mexico/General")).strftime("%Y-%m-%d %H:%M")
+            local_date = utc_date.astimezone(pytz.timezone("Mexico/General")).strftime("%Y-%m-%d %H:%M")  #  Format to display hour
             print(f"\t- {vote[0]} on {local_date}")
 
 
 def randomize_poll_winner():
+    """
+    Return:
+        Query: add option to poll
+    """
     poll_id = int(input("Enter poll you'd like to pick a winner for: "))
     poll = Poll.get(poll_id)
     _print_poll_options(poll.options)
@@ -111,11 +145,21 @@ def randomize_poll_winner():
 
 
 def all_bar_chart():
+    """
+    Return:
+        Plot: Get from database all polls and votes and make bar chart
+    """
     charts.chart_bar(database.get_polls_and_votes())
     plt.show()
 
 
-def select_chart(poll_id):
+def select_chart(poll_id: int):
+    """
+    Args:
+        arg1 (int): poll id to can select poll 
+    Return:
+        Menu: From MENU_PROMPT_CHART select what kind of chart view
+    """
     while (selection := input(MENU_PROMPT_CHART)) != "6":
 
         try:
@@ -126,14 +170,27 @@ def select_chart(poll_id):
 
 
 def pie_chart(poll_id: int):
-    charts.one_chart_bar(database.get_polls_and_votes())
+    """
+    plt
+    Args:
+        arg1 (int): poll id to can select poll
+    Return:
+        Plot: Get from database this poll and votes and make pie chart
+    """
+    options = database.get_options(poll_id)
+    charts.chart_pie(options)
     plt.show()
 
 def bar_chart(poll_id: int):
-    with get_connection() as connection:
-        poll = database.get_poll_bar(poll_id)
-        charts.one_chart_bar(poll)
-        plt.show()
+    """
+    plt
+    Args:
+        arg1 (int): poll id to can select poll
+    Return:
+        Plot: Get from database this poll and votes and make bar chart
+    """
+    charts.one_chart_bar(database.get_polls_and_votes())
+    plt.show()
 
 
 
@@ -143,12 +200,16 @@ MENU_OPTIONS_CHARTS = {
 }
 
 def select_poll():  
+    """
+    Return:
+        Query: add option to poll
+    """
     try:
-        for poll in Poll.all():
+        for poll in Poll.all():  #  Show all polls to know which someone can vote 
             print(f"{poll.id}: {poll.title} (created by {poll.owner})")
-        # print("All bar chart of polls (2)")
+
         poll_id = int(input("Enter poll would you like see stats: "))
-        select_chart(poll_id)
+        select_chart(poll_id)  #  Menu of charts 
 
     except KeyError:
         print("Invalid input selected. Please try again.")
@@ -165,6 +226,10 @@ MENU_OPTIONS = {
 
 
 def menu():
+    """
+    Return:
+        Menu: main menu to forward what kind of section view 
+    """
     with get_connection() as connection:
         database.create_tables(connection)
 

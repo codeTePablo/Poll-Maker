@@ -37,8 +37,10 @@ INSERT_VOTE = (
     "INSERT INTO votes (username, option_id, vote_timestamp) VALUES (%s, %s, %s);"
 )
 
-#  Plots 
+#  Charts
+
 load_dotenv()
+#  Connection for charts 
 connection_plot = psycopg2.connect(os.environ.get("DATABASE_URI"))
 
 SELECT_ONE_POLL = "SELECT * FROM polls WHERE id = %s;"
@@ -57,12 +59,25 @@ GROUP BY polls.title;"""
 
 @contextmanager
 def get_cursor(connection):
+    """
+    Args:
+        arg1 (str): connection to database
+    Return:
+        connection: this simplify so much to make connections, only we can call function
+        and wait cursor to execute after of any transaction
+    """
     with connection:
         with connection.cursor() as cursor:
             yield cursor
 
 
 def create_tables(connection):
+    """
+    Args:
+        arg1 (str): connection to database
+    Return:
+        Query: create polls
+    """
     with get_cursor(connection) as cursor:
         cursor.execute(CREATE_POLLS)
         cursor.execute(CREATE_OPTIONS)
@@ -92,9 +107,9 @@ def create_poll(connection, title: str, owner: str) -> int:
 def get_polls(connection) -> List[Poll]:
     """
     Args:
-        arg1 (): connection database
+        arg1 (str): connection to database
     Return:
-        List: List of Poll
+        List: List of Poll to select all polls into database
     """
     with get_cursor(connection) as cursor:
         cursor.execute(SELECT_ALL_POLLS)
@@ -104,7 +119,8 @@ def get_polls(connection) -> List[Poll]:
 def get_poll(connection, poll_id: int) -> Poll:
     """
     Args:
-        arg1 (int): select of some poll_id
+        arg1 (str): connection to database
+        arg2 (int): select poll with poll id
     Return:
         Query: return this poll_id of a poll
     """
@@ -116,7 +132,7 @@ def get_poll(connection, poll_id: int) -> Poll:
 def get_latest_poll(connection) -> List[Poll]:
     """
     Args:
-        arg1 (): connection database
+        arg1 (): connection to database
     Return:
         List = List of poll with options
     """
@@ -126,12 +142,25 @@ def get_latest_poll(connection) -> List[Poll]:
 
 
 def get_poll_options(connection, poll_id: int) -> List[Option]:
+    """
+    Args:
+        arg1 (str): connection to database
+        arg2 (int):  poll_id
+    Return:
+        List: list of Option with polls and options   
+    """
     with get_cursor(connection) as cursor:
         cursor.execute(SELECT_POLL_OPTIONS, (poll_id,))
         return cursor.fetchall()
 
 
 def get_poll_bar(poll_id: int):
+    """
+    Args:
+        arg1 (int): select poll with poll id  
+    Return:
+        Query: return poll 
+    """
     with connection_plot:
         with connection_plot.cursor() as cursor:
             cursor.execute(SELECT_ONE_POLL, (poll_id,))
@@ -140,11 +169,10 @@ def get_poll_bar(poll_id: int):
 
 def get_polls_and_votes():
     """
-    plt
     Args:
-        arg1 (int): poll id to can add option
+        arg1 (): 
     Return:
-        Query: add option to poll
+        Query: return all poll with votes 
     """
     with connection_plot:
         with connection_plot.cursor() as cursor:
@@ -156,6 +184,13 @@ def get_polls_and_votes():
 
 
 def get_option(connection, option_id: int) -> Option:
+    """
+    Args:
+        arg1 (str): connection to database
+        arg1 (int): option id of some poll
+    Return:
+        Query: return text of option with option id  
+    """
     with get_cursor(connection) as cursor:
         cursor.execute(SELECT_OPTION, (option_id,))
         return cursor.fetchone()
@@ -164,9 +199,9 @@ def get_options(poll_id: int):
     """
     plt
     Args:
-        arg1 (int): poll id to can add option
+        arg1 (int): select some poll with poll id 
     Return:
-        Query: add option to poll
+        Query: return options of poll 
     """
     with connection_plot:
         with connection_plot.cursor() as cursor:
@@ -177,7 +212,7 @@ def get_options(poll_id: int):
 def add_option(connection, option_text: str, poll_id: int):
     """
     Args:
-        arg1 (): connection database
+        arg1 (): connection to database
         arg2 (str): option_text to add option inside a poll
         arg3 (int): poll id to can add option
     Return:
