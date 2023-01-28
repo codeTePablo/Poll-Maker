@@ -30,10 +30,7 @@ Enter your choice: """
 MENU_PROMPT_CHART = """-- Menu --
 1) Pie chart
 2) Bar chart
-3) 
-4) 
-5)
-6) Exit
+3) Exit
 """ 
 NEW_OPTION_PROMPT = "Enter new option text (or leave empty to stop adding options): "
 

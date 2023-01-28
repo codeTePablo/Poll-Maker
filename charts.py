@@ -13,8 +13,8 @@ def chart_pie(options):
     axes = figure.add_subplot()
     # print(options)
 
-    poll_options = [poll[1] for poll in poll]
-    poll_names = [poll[0] for poll in poll]
+    poll_options = [poll[1] for poll in options]
+    poll_names = [poll[0] for poll in options]
 
     axes.pie(
         poll_options,  #  List of quantities of poll options  
