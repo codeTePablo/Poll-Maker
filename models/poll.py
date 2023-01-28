@@ -53,6 +53,17 @@ class Poll:
             new_poll_id = database.create_poll(connection, self.title, self.owner)
             self.id = new_poll_id
 
+    def delete_poll(self, drop_id: int):
+        """
+        Args:
+            arg1 (self): self class
+            arg1 (int): use id from some poll to delete
+        Return:
+            Query: drop poll
+        """
+        with get_connection() as connection:
+            database.delete_poll(connection, drop_id)
+
     @property
     def options(self) -> List[Option]:
         """

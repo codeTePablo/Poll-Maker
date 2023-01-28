@@ -22,7 +22,8 @@ MENU_PROMPT = """-- Menu --
 5) Select a random winner from a poll option
 6) Charts
 7) Bar chart all polls 
-8) Exit
+8) Drop poll
+9) Exit
 
 Enter your choice: """
 
@@ -214,6 +215,17 @@ def select_poll():
     except KeyError:
         print("Invalid input selected. Please try again.")
 
+
+def drop_poll():
+    """
+    Return:
+        Query: delete poll
+    """
+    delete_poll = int(input("what poll do you want drop: "))
+    poll = Poll(title=None, owner=None)
+    poll.delete_poll(delete_poll)
+
+
 MENU_OPTIONS = {
     "1": prompt_create_poll,
     "2": list_open_polls,
@@ -221,7 +233,8 @@ MENU_OPTIONS = {
     "4": show_poll_votes,
     "5": randomize_poll_winner,
     "6": select_poll, 
-    "7": all_bar_chart
+    "7": all_bar_chart,
+    "8": drop_poll
 }
 
 
@@ -233,7 +246,7 @@ def menu():
     with get_connection() as connection:
         database.create_tables(connection)
 
-    while (selection := input(MENU_PROMPT)) != "8":
+    while (selection := input(MENU_PROMPT)) != "9":
         try:
             MENU_OPTIONS[selection]()
         except KeyError:

@@ -36,6 +36,7 @@ INSERT_OPTION = (
 INSERT_VOTE = (
     "INSERT INTO votes (username, option_id, vote_timestamp) VALUES (%s, %s, %s);"
 )
+DELETE_POLL = "DELETE FROM polls WHERE id = %s;"
 
 #  Charts
 
@@ -179,6 +180,15 @@ def get_polls_and_votes():
             cursor.execute(SELECT_EACH_POLLS)
             return cursor.fetchall()
 
+def delete_poll(connection, poll_id: int):
+    """     
+    Args:
+        arg1 (): 
+    Return:
+        Query: with poll_id delete anyone from polls  
+    """
+    with get_cursor(connection) as cursor:
+        cursor.execute(DELETE_POLL, (poll_id,))
 
 # -- options --
 
